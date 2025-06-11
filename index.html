@@ -160,7 +160,7 @@
 <h4 id="什么是分布式事务？"><a href="#什么是分布式事务？" class="headerlink" title="什么是分布式事务？"></a>什么是<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1&spm=1001.2101.3001.7020">分布式事务</a>？</h4><p>大家都知道事务有<strong>四大特性（ACID） ，原子性、一致性、隔离性、持久性</strong>。那么什么是分布式事务呢？就是从单机变成多个机器。那么这个时候问题就出现了，比如你要吃饭，自已怎么点什么都行，想吃什么点什么，但是此时不是你自已了，就可能会出现意见的分歧等等。<img src="/images/13c4898371914468beb265cc8682af92.png" alt="13c4898371914468beb265cc8682af92"></p>
 <p> <strong>分布式事务确保所有参与的数据库或服务要么全部成功提交，要么全部回滚，以保证数据的一致性。分布式事务的实现和管理比单一数据库的事务要复杂得多。</strong></p>
 <h1 id="分布式事务的定理"><a href="#分布式事务的定理" class="headerlink" title="分布式事务的定理"></a>分布式事务的定理</h1><h2 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h2><p> CAP是加州大学计算机科学家Eric Brewer在2000年提出的一个关于分布式系统的基本理论。</p>
-<p><img src="/images%5C867c0d16d092482681e117cf1e3fb3aa.png" alt="867c0d16d092482681e117cf1e3fb3aa"></p>
+<p><img src="/images/867c0d16d092482681e117cf1e3fb3aa.png" alt="867c0d16d092482681e117cf1e3fb3aa"></p>
 <ul>
 <li><p>C指的是Consistency（一致性）：就是说在分布式中，所有节点在同一时间看到的数据要是一致的。</p>
 </li>
@@ -193,9 +193,9 @@
 <li>PreCommit阶段（预提交阶段）。<br>记录日志：记录准备进入预提交状态。<br>发送预提交请求：向所有参与者发送PreCommit请求。<br>参与者在收到PreCommit请求后，执行以下操作：</li>
 </ol>
 <p>记录日志：记录进入预提交状态。<br>准备提交：执行事务操作，但不提交。<br>发送响应：确认已进入预提交状态，返回ACK。<br>3. DoCommit阶段（提交阶段）<br>提交事务：如果所有参与者都返回ACK，协调者向所有参与者发送DoCommit请求。参与者在收到DoCommit请求后，提交事务并释放资源。<br>回滚事务：如果有任何参与者未返回ACK，协调者向所有参与者发送Abort请求。参与者在收到Abort请求后，回滚事务并释放资源。</p>
-<h4 id="柔性事务"><a href="#柔性事务" class="headerlink" title="柔性事务"></a>柔性事务</h4><p>柔性事务*<img src="/Dimages%5Cb56de3bd70a14835b0b91831c97a4e28.png" alt="b56de3bd70a14835b0b91831c97a4e28"><em>偏AP（最终一致性），比如TCC、Saga。</em>*</p>
-<p><img src="/images%5C2b96e78c726940709929c774e21ca79f.png" alt="2b96e78c726940709929c774e21ca79f"></p>
-<p><img src="/images%5C69ad9a4802d2445383ffcb498d4a7de3.png" alt="69ad9a4802d2445383ffcb498d4a7de3"><img src="/images%5C9d404ec25bf342fa9c45fb6bf69b9f72.png" alt="f7783ad0b0a741f29074eff22d8e1e47"></p>
+<h4 id="柔性事务"><a href="#柔性事务" class="headerlink" title="柔性事务"></a>柔性事务</h4><p>柔性事务*<img src="/images/b56de3bd70a14835b0b91831c97a4e28.png" alt="b56de3bd70a14835b0b91831c97a4e28"><em>偏AP（最终一致性），比如TCC、Saga。</em>*</p>
+<p><img src="/images/2b96e78c726940709929c774e21ca79f.png" alt="2b96e78c726940709929c774e21ca79f"></p>
+<p><img src="/images/69ad9a4802d2445383ffcb498d4a7de3.png" alt="69ad9a4802d2445383ffcb498d4a7de3"><img src="/images/9d404ec25bf342fa9c45fb6bf69b9f72.png" alt="f7783ad0b0a741f29074eff22d8e1e47"></p>
 
             
         </div>
@@ -228,13 +228,13 @@
             
             <p>title: Raft一致性算法<br>date: 2025-06-11 20:40:56<br>什么是Raft？</p>
 <p>​        Raft是一种非拜占庭的算法，指的是所有通信都必须是真实的而非捏造的，Raft最多容许N个节点中（N为奇数）故障(N-1)&#x2F;2,就是不能故障超过半数。</p>
-<p><img src="/images%5C8675e1c6e0e646e9be93a2e76b7b3b0f.gif" alt="8675e1c6e0e646e9be93a2e76b7b3b0f"></p>
+<p><img src="/images/8675e1c6e0e646e9be93a2e76b7b3b0f.gif" alt="8675e1c6e0e646e9be93a2e76b7b3b0f"></p>
 <p>​        如图所示，这是Raft的日志复制流程，每个节点都通过日志列表来记录对应的操作，Raft里面有三个角色，分别是Leader（领导）、Follower（跟随者）、Candidate（获选人）。最开始每一个都是Follower，通过Raft的定时器来变成Candidate，之后通过投票选举变成Leader。每一个客户端都要和Leader交互。</p>
 <p>​        当Leader接收到请求之后，并不会立刻执行对应操作，而是将操作写入到日志文件当中，并发送给Follower让他们也写入到自已的日志中并返回信息给Leader，只有超过半数写入日志后Leader才会返回给客户端，同时告诉其他节点进行此操作。</p>
 <p>Raft解决了什么问题？</p>
 <p>​        Raft是一致性算法，所谓一致性算法就是解决再单机情况下如果出现问题，导致数据丢失等事情的发生。那如何解决的呢？答案很简单，就是通过备份，在一台机器上容易发生问题？那我就多台，在每台机器上都执行对应的操作不就行了！</p>
 <p>  Raft的选举机制</p>
-<p><img src="/images%5C37ab00c30fa94890948458a4866b0145.gif" alt="img"><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动">编辑</p>
+<p><img src="/images/37ab00c30fa94890948458a4866b0145.gif" alt="img"><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动">编辑</p>
 <p>​        如图所示，这就是Raft的初次选举，在最开始的时候所有节点都是Follower，每个Follower都有一个定时器，当收到Leader的信息之后会更新定时器，当定时器结束时没有收到Leader发来消息，证明Leader已经死亡或者根本不存在，这个时候该节点就会变成Candidate，通过投票选举（该节点向其他节点发出投票信息，如果超过一半以上即通过选举，该节点成为Leader），成功成为Leader之后，新的Leader会向其他Follower发送心跳信息，方式其他节点成为Leader节点。</p>
 <p>​        如果该节点未能成功竞选为Leader，那么Raft会重复这个操作，直到出现Leader为止。</p>
 <p>选举分区</p>

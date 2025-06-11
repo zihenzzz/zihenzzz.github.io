@@ -132,7 +132,7 @@
 <h4 id="什么是分布式事务？"><a href="#什么是分布式事务？" class="headerlink" title="什么是分布式事务？"></a>什么是<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1&spm=1001.2101.3001.7020">分布式事务</a>？</h4><p>大家都知道事务有<strong>四大特性（ACID） ，原子性、一致性、隔离性、持久性</strong>。那么什么是分布式事务呢？就是从单机变成多个机器。那么这个时候问题就出现了，比如你要吃饭，自已怎么点什么都行，想吃什么点什么，但是此时不是你自已了，就可能会出现意见的分歧等等。<img src="/images/13c4898371914468beb265cc8682af92.png" alt="13c4898371914468beb265cc8682af92"></p>
 <p> <strong>分布式事务确保所有参与的数据库或服务要么全部成功提交，要么全部回滚，以保证数据的一致性。分布式事务的实现和管理比单一数据库的事务要复杂得多。</strong></p>
 <h1 id="分布式事务的定理"><a href="#分布式事务的定理" class="headerlink" title="分布式事务的定理"></a>分布式事务的定理</h1><h2 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h2><p> CAP是加州大学计算机科学家Eric Brewer在2000年提出的一个关于分布式系统的基本理论。</p>
-<p><img src="/images%5C867c0d16d092482681e117cf1e3fb3aa.png" alt="867c0d16d092482681e117cf1e3fb3aa"></p>
+<p><img src="/images/867c0d16d092482681e117cf1e3fb3aa.png" alt="867c0d16d092482681e117cf1e3fb3aa"></p>
 <ul>
 <li><p>C指的是Consistency（一致性）：就是说在分布式中，所有节点在同一时间看到的数据要是一致的。</p>
 </li>
@@ -165,9 +165,9 @@
 <li>PreCommit阶段（预提交阶段）。<br>记录日志：记录准备进入预提交状态。<br>发送预提交请求：向所有参与者发送PreCommit请求。<br>参与者在收到PreCommit请求后，执行以下操作：</li>
 </ol>
 <p>记录日志：记录进入预提交状态。<br>准备提交：执行事务操作，但不提交。<br>发送响应：确认已进入预提交状态，返回ACK。<br>3. DoCommit阶段（提交阶段）<br>提交事务：如果所有参与者都返回ACK，协调者向所有参与者发送DoCommit请求。参与者在收到DoCommit请求后，提交事务并释放资源。<br>回滚事务：如果有任何参与者未返回ACK，协调者向所有参与者发送Abort请求。参与者在收到Abort请求后，回滚事务并释放资源。</p>
-<h4 id="柔性事务"><a href="#柔性事务" class="headerlink" title="柔性事务"></a>柔性事务</h4><p>柔性事务*<img src="/Dimages%5Cb56de3bd70a14835b0b91831c97a4e28.png" alt="b56de3bd70a14835b0b91831c97a4e28"><em>偏AP（最终一致性），比如TCC、Saga。</em>*</p>
-<p><img src="/images%5C2b96e78c726940709929c774e21ca79f.png" alt="2b96e78c726940709929c774e21ca79f"></p>
-<p><img src="/images%5C69ad9a4802d2445383ffcb498d4a7de3.png" alt="69ad9a4802d2445383ffcb498d4a7de3"><img src="/images%5C9d404ec25bf342fa9c45fb6bf69b9f72.png" alt="f7783ad0b0a741f29074eff22d8e1e47"></p>
+<h4 id="柔性事务"><a href="#柔性事务" class="headerlink" title="柔性事务"></a>柔性事务</h4><p>柔性事务*<img src="/images/b56de3bd70a14835b0b91831c97a4e28.png" alt="b56de3bd70a14835b0b91831c97a4e28"><em>偏AP（最终一致性），比如TCC、Saga。</em>*</p>
+<p><img src="/images/2b96e78c726940709929c774e21ca79f.png" alt="2b96e78c726940709929c774e21ca79f"></p>
+<p><img src="/images/69ad9a4802d2445383ffcb498d4a7de3.png" alt="69ad9a4802d2445383ffcb498d4a7de3"><img src="/images/9d404ec25bf342fa9c45fb6bf69b9f72.png" alt="f7783ad0b0a741f29074eff22d8e1e47"></p>
 
     </div>
     
