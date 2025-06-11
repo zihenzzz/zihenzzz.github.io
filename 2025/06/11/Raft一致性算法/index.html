@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title> | 子痕zzz</title>
+    <title>Raft一致性算法 | 子痕zzz</title>
     <meta name="author" content="子痕zzz" />
     <meta name="description" content="" />
     <meta name="keywords" content="" />
@@ -114,7 +114,7 @@
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
             <div class="article">
     <div>
-        <h1></h1>
+        <h1>Raft一致性算法</h1>
     </div>
     <div class="info">
         <span class="date">
@@ -128,8 +128,8 @@
     </div>
     
     <div class="content" v-pre>
-        <p>title: Raft一致性算法<br>date: 2025-06-11 20:40:56<br>什么是Raft？</p>
-<p>​        Raft是一种非拜占庭的算法，指的是所有通信都必须是真实的而非捏造的，Raft最多容许N个节点中（N为奇数）故障(N-1)&#x2F;2,就是不能故障超过半数。</p>
+        <h2><span id="目录">目录</span></h2><p><a href="#%E4%BB%80%E4%B9%88%E6%98%AFRaft%EF%BC%9F">什么是Raft？</a></p>
+<h1><span id="什么是raft">什么是Raft？</span></h1><p>​        Raft是一种非拜占庭的算法，指的是所有通信都必须是真实的而非捏造的，Raft最多容许N个节点中（N为奇数）故障(N-1)&#x2F;2,就是不能故障超过半数。</p>
 <p><img src="/images/8675e1c6e0e646e9be93a2e76b7b3b0f.gif" alt="8675e1c6e0e646e9be93a2e76b7b3b0f"></p>
 <p>​        如图所示，这是Raft的日志复制流程，每个节点都通过日志列表来记录对应的操作，Raft里面有三个角色，分别是Leader（领导）、Follower（跟随者）、Candidate（获选人）。最开始每一个都是Follower，通过Raft的定时器来变成Candidate，之后通过投票选举变成Leader。每一个客户端都要和Leader交互。</p>
 <p>​        当Leader接收到请求之后，并不会立刻执行对应操作，而是将操作写入到日志文件当中，并发送给Follower让他们也写入到自已的日志中并返回信息给Leader，只有超过半数写入日志后Leader才会返回给客户端，同时告诉其他节点进行此操作。</p>
