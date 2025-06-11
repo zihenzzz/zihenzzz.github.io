@@ -125,63 +125,110 @@
         </span>
         
         
-        <span class="tags">
-            <span class="icon">
-                <i class="fa-solid fa-tags fa-fw"></i>
-            </span>
-            
-            
-            <span class="tag">
-                
-                <a href="/tags/%E4%BB%80%E4%B9%88%E6%98%AF%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%EF%BC%9F/" style="color: #00bcd4">
-                    什么是分布式事务？
-                </a>
-            </span>
-            
-        </span>
-        
     </div>
     
     <div class="content" v-pre>
-        <h4 id="什么是分布式事务？"><a href="#什么是分布式事务？" class="headerlink" title="什么是分布式事务？"></a>什么是<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1&spm=1001.2101.3001.7020">分布式事务</a>？</h4><p>大家都知道事务有<strong>四大特性（ACID） ，原子性、一致性、隔离性、持久性</strong>。那么什么是分布式事务呢？就是从单机变成多个机器。那么这个时候问题就出现了，比如你要吃饭，自已怎么点什么都行，想吃什么点什么，但是此时不是你自已了，就可能会出现意见的分歧等等。<img src="/images/13c4898371914468beb265cc8682af92.png" alt="13c4898371914468beb265cc8682af92"></p>
-<p> <strong>分布式事务确保所有参与的数据库或服务要么全部成功提交，要么全部回滚，以保证数据的一致性。分布式事务的实现和管理比单一数据库的事务要复杂得多。</strong></p>
-<h1 id="分布式事务的定理"><a href="#分布式事务的定理" class="headerlink" title="分布式事务的定理"></a>分布式事务的定理</h1><h2 id="CAP"><a href="#CAP" class="headerlink" title="CAP"></a>CAP</h2><p> CAP是加州大学计算机科学家Eric Brewer在2000年提出的一个关于分布式系统的基本理论。</p>
-<p><img src="/images/867c0d16d092482681e117cf1e3fb3aa.png" alt="867c0d16d092482681e117cf1e3fb3aa"></p>
-<ul>
-<li><p>C指的是Consistency（一致性）：就是说在分布式中，所有节点在同一时间看到的数据要是一致的。</p>
-</li>
-<li><p>A指的是Availablity (可用性)：指的是访问某个节点的时候，必须要得到反馈，而不是拒绝或者错误。</p>
-</li>
-<li><p>P指的是Partition Tolerance（分区容错性）：分区（当某个节点出现问题，和其他节点失去连接从而独自形成了一个区域）。就是说即使出现分区的情况，我们也要对外能够提供服务。</p>
-</li>
+        <h2><span id="目录">目录</span></h2><ul>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1">什么是分布式事务？</a></li>
+<li><a href="#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E7%9A%84%E5%AE%9A%E7%90%86">分布式事务的定理</a><ul>
+<li><a href="#cap">CAP</a></li>
+<li><a href="#cap%E5%8F%96%E8%88%8D%E9%97%AE%E9%A2%98">CAP取舍问题</a></li>
+<li><a href="#base%E5%AE%9A%E7%90%86">Base定理</a></li>
 </ul>
-<p>而这个理论的意思是，任何分布式系统都无法满足这三个特性，必须做出取舍。</p>
-<h2 id="CAP取舍问题"><a href="#CAP取舍问题" class="headerlink" title="CAP取舍问题"></a>CAP取舍问题</h2><p> 在CAP做取舍问题时候，我们要知道，任何分布式系统都会有P（分区容错性）这个问题，所以我们一般都只会在AP之中做取舍。</p>
-<h5 id="Base定理"><a href="#Base定理" class="headerlink" title="Base定理"></a>Base定理</h5><p>Base定理是对CAP的补充和拓展。</p>
-<ul>
-<li><p>BA指的是（Basically Available）基本可用：就是说我们分布式系统允许出现故障，但是也要保证能对外提供核心服务。</p>
 </li>
-<li><p>S指的是（Soft State）软状态：说的是我们分布式系统中允许在短时间之内出现数据不一致的情况。</p>
-</li>
-<li><p>E指的是（Eventual Consistency）最终一致性：在软状态结束之后，我们要在最后保证数据的一致性。</p>
-</li>
+<li><a href="#%E5%88%9A%E6%80%A7%E4%BA%8B%E5%8A%A1">刚性事务</a><ul>
+<li><a href="#2pc">2PC</a></li>
+<li><a href="#3pc">3PC</a></li>
 </ul>
-<p>BASE理论是在牺牲强一致性的前提下，通过实现基本可用、软状态和最终一致性，来实现高可用性和分区容错性。   </p>
-<h4 id="刚性事务"><a href="#刚性事务" class="headerlink" title="刚性事务"></a>刚性事务</h4><p>刚性事务是偏向CP，具有强一致性，但失去可用性。比如2PC、3PC、XA协议。本文只介绍2PC和3PC。</p>
-<p>2PC<br>        2PC是两阶段提交协议（就是说第一段不提交，第二段提交，牺牲一定性能保证强一致性）。</p>
-<pre><code>第一阶段：协调者向参与者发送提交请求，询问他们是否可以提交。每个参与这收到消息之后，会做三件事  ：
-</code></pre>
-<p>参与者尝试执行事务，但不会提交。<br>参与者之后会将事务操作的状态（成功或者失败）进行持久化，方便后续恢复。<br>参与者将事务操作状态返回给协调者。<br>第二阶段：这是提交阶段，协调者会根据协调者的反馈进行判断，如果有失败的则会回滚，泉捕成功则会执行。</p>
-<p>提交事务：如果所有参与者都准备成功，协调者向所有参与者发送提交请求。参与者在收到提交请求后，提交事务并释放资源。<br>回滚事务：如果有任何参与者准备失败，协调者向所有参与者发送回滚请求。参与者在收到回滚请求后，回滚事务并释放资源。<br><code>Coordinator                  Participant 1                  Participant 2      |                            |                             |      |------ Prepare Request ----&gt;|                             |      |                            |                             |      |&lt;------ Prepare OK ---------|                             |      |                            |                             |      |                            |------ Prepare Request -----&gt;|      |                            |                             |      |                            |&lt;------ Prepare OK ----------|      |                            |                             |      |------ Commit Request -----&gt;|                             |      |                            |                             |      |                            |------ Commit Request ------&gt;|      |                            |                             |      |                            |                             |</code></p>
-<p>3PC<br>        3PC是对2PC的一个改进，，用于解决2PC中的一些缺点，如单点故障和阻塞问题。</p>
+</li>
+<li><a href="#%E6%9F%94%E6%80%A7%E4%BA%8B%E5%8A%A1">柔性事务</a></li>
+</ul>
+<hr>
+<h4><span id="什么是分布式事务">什么是？</span></h4><p>大家都知道事务有<strong>四大特性（ACID）</strong>：  </p>
+<ul>
+<li><strong>原子性</strong>（Atomicity）</li>
+<li><strong>一致性</strong>（Consistency）</li>
+<li><strong>隔离性</strong>（Isolation）</li>
+<li><strong>持久性</strong>（Durability）</li>
+</ul>
+<p>分布式事务是指跨多个数据库或服务的操作，需要保证所有参与方要么全部成功提交，要么全部回滚。<br><img src="/images/13c4898371914468beb265cc8682af92.png" alt="分布式事务示意图"></p>
+<blockquote>
+<p><strong>核心挑战</strong>：在分布式环境下，网络分区、节点故障等问题会破坏ACID特性。</p>
+</blockquote>
+<hr>
+<h2><span id="分布式事务的定理">分布式事务的定理</span></h2><h3><span id="cap">CAP</span></h3><p>由Eric Brewer提出，描述分布式系统的三个核心特性：<br><img src="/images/867c0d16d092482681e117cf1e3fb3aa.png" alt="CAP定理图示"></p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>C</strong>onsistency</td>
+<td>所有节点同时看到相同数据</td>
+</tr>
+<tr>
+<td><strong>A</strong>vailability</td>
+<td>每次请求必须得到响应</td>
+</tr>
+<tr>
+<td><strong>P</strong>artition Tolerance</td>
+<td>网络分区时系统仍能运行</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p><strong>CAP不可兼得</strong>：实际系统中必须牺牲其一（通常选择CP或AP）。</p>
+</blockquote>
+<hr>
+<h3><span id="cap取舍问题">CAP取舍问题</span></h3><p>由于分区容错性（P）是分布式系统的刚需，实际取舍在C和A之间：</p>
+<table>
+<thead>
+<tr>
+<th>选择</th>
+<th>场景</th>
+<th>案例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>CP</strong></td>
+<td>强一致性优先</td>
+<td>银行转账、ZooKeeper</td>
+</tr>
+<tr>
+<td><strong>AP</strong></td>
+<td>高可用性优先</td>
+<td>电商库存、Cassandra</td>
+</tr>
+</tbody></table>
+<hr>
+<h3><span id="base定理">Base定理</span></h3><p>对CAP的补充，强调最终一致性：</p>
+<ul>
+<li><strong>BA</strong>（Basically Available）：允许降级服务</li>
+<li><strong>S</strong>（Soft State）：允许中间状态不一致</li>
+<li><strong>E</strong>（Eventual Consistency）：最终达成一致</li>
+</ul>
+<blockquote>
+<p>适用于容忍延迟一致性的场景（如社交媒体的点赞数同步）。</p>
+</blockquote>
+<hr>
+<h2><span id="刚性事务">刚性事务</span></h2><h3><span id="2pc两阶段提交">2PC（两阶段提交）</span></h3><p><strong>阶段1：准备阶段</strong>  </p>
 <ol>
-<li>CanCommit阶段（询问阶段）<br>记录日志：记录收到的CanCommit请求。<br>判断是否可以提交：检查是否可以执行事务操作。<br>响应协调者：如果可以准备提交，返回Yes；否则，返回No。</li>
-<li>PreCommit阶段（预提交阶段）。<br>记录日志：记录准备进入预提交状态。<br>发送预提交请求：向所有参与者发送PreCommit请求。<br>参与者在收到PreCommit请求后，执行以下操作：</li>
+<li>协调者发送Prepare请求  </li>
+<li>参与者执行事务但不提交  </li>
+<li>返回Ready&#x2F;Abort状态</li>
 </ol>
-<p>记录日志：记录进入预提交状态。<br>准备提交：执行事务操作，但不提交。<br>发送响应：确认已进入预提交状态，返回ACK。<br>3. DoCommit阶段（提交阶段）<br>提交事务：如果所有参与者都返回ACK，协调者向所有参与者发送DoCommit请求。参与者在收到DoCommit请求后，提交事务并释放资源。<br>回滚事务：如果有任何参与者未返回ACK，协调者向所有参与者发送Abort请求。参与者在收到Abort请求后，回滚事务并释放资源。</p>
-<h4 id="柔性事务"><a href="#柔性事务" class="headerlink" title="柔性事务"></a>柔性事务</h4><p>柔性事务*<img src="/images/b56de3bd70a14835b0b91831c97a4e28.png" alt="b56de3bd70a14835b0b91831c97a4e28"><em>偏AP（最终一致性），比如TCC、Saga。</em>*</p>
-<p><img src="/images/2b96e78c726940709929c774e21ca79f.png" alt="2b96e78c726940709929c774e21ca79f"></p>
-<p><img src="/images/69ad9a4802d2445383ffcb498d4a7de3.png" alt="69ad9a4802d2445383ffcb498d4a7de3"><img src="/images/9d404ec25bf342fa9c45fb6bf69b9f72.png" alt="f7783ad0b0a741f29074eff22d8e1e47"></p>
+<p><strong>阶段2：提交阶段</strong>  </p>
+<ul>
+<li>全部Ready → 发送Commit  </li>
+<li>任意Abort → 发送Rollback</li>
+</ul>
+<pre><code class="language-plaintext">Coordinator → Participant 1: Prepare Request
+Participant 1 → Coordinator: Prepare OK
+Coordinator → Participant 2: Prepare Request
+Participant 2 → Coordinator: Prepare OK
+Coordinator → All: Commit Request
+</code></pre>
 
     </div>
     
