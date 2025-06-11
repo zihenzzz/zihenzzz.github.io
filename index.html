@@ -158,7 +158,7 @@
             
             <p>title: Raft一致性算法<br>date: 2025-06-11 20:40:56<br>什么是Raft？</p>
 <p>​        Raft是一种非拜占庭的算法，指的是所有通信都必须是真实的而非捏造的，Raft最多容许N个节点中（N为奇数）故障(N-1)&#x2F;2,就是不能故障超过半数。</p>
-<p><img src="https://i-blog.csdnimg.cn/direct/8675e1c6e0e646e9be93a2e76b7b3b0f.gif" alt="img"><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动">编辑</p>
+<p><img src="/img/8675e1c6e0e646e9be93a2e76b7b3b0f.gif" alt="img"><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动">编辑</p>
 <p>​        如图所示，这是Raft的日志复制流程，每个节点都通过日志列表来记录对应的操作，Raft里面有三个角色，分别是Leader（领导）、Follower（跟随者）、Candidate（获选人）。最开始每一个都是Follower，通过Raft的定时器来变成Candidate，之后通过投票选举变成Leader。每一个客户端都要和Leader交互。</p>
 <p>​        当Leader接收到请求之后，并不会立刻执行对应操作，而是将操作写入到日志文件当中，并发送给Follower让他们也写入到自已的日志中并返回信息给Leader，只有超过半数写入日志后Leader才会返回给客户端，同时告诉其他节点进行此操作。</p>
 <p>Raft解决了什么问题？</p>
