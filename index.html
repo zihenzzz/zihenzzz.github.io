@@ -139,6 +139,68 @@
         
 
 <div class="post">
+    <a href="/2025/06/12/rag/">
+        <h2 class="post-title">rag</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2025/6/12
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>目录</p>
+<ul>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AFRAG?">什么是RAG?</a></li>
+<li><a href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E6%9C%89RAG%EF%BC%9F">为什么会有RAG?</a></li>
+<li><a href="#LLM%E5%92%8C%E5%A4%A7%E6%A8%A1%E5%9E%8B">LLM和大模型</a></li>
+</ul>
+<h1><span id="什么是rag">什么是RAG?</span></h1><p>RAG全称是检索增强生成</p>
+<ul>
+<li>检索的意思是将用户提问的话进行编码，编码成向量，然后去向量数据库里面进行查询和检索</li>
+<li>增强是将检索到的文档数据进行一个拼接</li>
+<li>生成是大模型和上下文进行结合最后回答的话</li>
+</ul>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">问题：<span class="string">&quot;量子纠缠的实际应用有哪些？&quot;</span></span><br><span class="line">检索到文档：量子通信、量子计算相关论文片段</span><br><span class="line">生成答案：<span class="string">&quot;量子纠缠应用于量子密钥分发（QKD）和量子计算机中的量子比特耦合...&quot;</span></span><br></pre></td></tr></table></figure>
+
+<h1><span id="为什么会有rag">为什么会有RAG？</span></h1><p>因为大模型会有知识局限性、幻觉问题、数据安全性问题</p>
+<ul>
+<li><p>知识局限性：大模型里面数据基本上都是现在网络中能查到的，有些非公开的和离线的数据差不多。</p>
+</li>
+<li><p>幻觉：因为大模型的底层基本上都是一些数学的运算，所以大模型很有可能会出现胡说八道的现象，尤其是在面对大模型的知识盲区</p>
+</li>
+<li><p>数据安全性：很多企业内部的数据是不会对外公开的，所以大模型是搜不到的</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RAG = 检索技术 + LLM 提示</span><br></pre></td></tr></table></figure>
+
+<p>可以将RAG的核心理解为“检索+生成”，前者主要是利用向量数据库的高效存储和检索能力，召回目标知识；后者则是利用大模型和Prompt工程，将召回的知识合理利用，生成目标答案。</p>
+<p>完整的RAG应用流程主要包含两个阶段：</p>
+<ul>
+<li>数据准备阶段：数据提取——&gt;文本分割——&gt;向量化（embedding）——&gt;数据入库</li>
+<li>应用阶段：用户提问——&gt;数据检索（召回）——&gt;注入Prompt——&gt;LLM生成答案</li>
+</ul>
+</li>
+</ul>
+<h1><span id="llm和大模型">LLM和大模型</span></h1><p>LLM是（大模型语言） 用于写作对话、大模型是超级大脑，用于学习知识</p>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2025/06/12/rag/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/2025/06/11/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
         <h2 class="post-title">分布式事务</h2>
     </a>
@@ -287,15 +349,17 @@ Coordinator → All: Commit Request
     <div class="description">
         <div class="content" v-pre>
             
-            <h2><span id="目录">目录</span></h2><p><a href="#%E4%BB%80%E4%B9%88%E6%98%AFRaft%EF%BC%9F">什么是Raft？</a></p>
-<h1><span id="什么是raft">什么是Raft？</span></h1><p>​        Raft是一种非拜占庭的算法，指的是所有通信都必须是真实的而非捏造的，Raft最多容许N个节点中（N为奇数）故障(N-1)&#x2F;2,就是不能故障超过半数。</p>
+            <h2><span id="目录">目录</span></h2><ul>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AFraft">什么是Raft？</a></li>
+<li><a href="#raft%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6">raft的选举机制</a></li>
+</ul>
+<h2><span id="什么是raft">什么是Raft？</span></h2><p>​        Raft是一种非拜占庭的算法，指的是所有通信都必须是真实的而非捏造的，Raft最多容许N个节点中（N为奇数）故障(N-1)&#x2F;2,就是不能故障超过半数。</p>
 <p><img src="/images/8675e1c6e0e646e9be93a2e76b7b3b0f.gif" alt="8675e1c6e0e646e9be93a2e76b7b3b0f"></p>
 <p>​        如图所示，这是Raft的日志复制流程，每个节点都通过日志列表来记录对应的操作，Raft里面有三个角色，分别是Leader（领导）、Follower（跟随者）、Candidate（获选人）。最开始每一个都是Follower，通过Raft的定时器来变成Candidate，之后通过投票选举变成Leader。每一个客户端都要和Leader交互。</p>
 <p>​        当Leader接收到请求之后，并不会立刻执行对应操作，而是将操作写入到日志文件当中，并发送给Follower让他们也写入到自已的日志中并返回信息给Leader，只有超过半数写入日志后Leader才会返回给客户端，同时告诉其他节点进行此操作。</p>
 <p>Raft解决了什么问题？</p>
 <p>​        Raft是一致性算法，所谓一致性算法就是解决再单机情况下如果出现问题，导致数据丢失等事情的发生。那如何解决的呢？答案很简单，就是通过备份，在一台机器上容易发生问题？那我就多台，在每台机器上都执行对应的操作不就行了！</p>
-<p>  Raft的选举机制</p>
-<p><img src="/images/37ab00c30fa94890948458a4866b0145.gif" alt="img"><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动">编辑</p>
+<h2><span id="raft的选举机制">Raft的选举机制</span></h2><p><img src="/images/37ab00c30fa94890948458a4866b0145.gif" alt="img"><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动">编辑</p>
 <p>​        如图所示，这就是Raft的初次选举，在最开始的时候所有节点都是Follower，每个Follower都有一个定时器，当收到Leader的信息之后会更新定时器，当定时器结束时没有收到Leader发来消息，证明Leader已经死亡或者根本不存在，这个时候该节点就会变成Candidate，通过投票选举（该节点向其他节点发出投票信息，如果超过一半以上即通过选举，该节点成为Leader），成功成为Leader之后，新的Leader会向其他Follower发送心跳信息，方式其他节点成为Leader节点。</p>
 <p>​        如果该节点未能成功竞选为Leader，那么Raft会重复这个操作，直到出现Leader为止。</p>
 <p>选举分区</p>
