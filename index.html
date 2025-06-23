@@ -139,6 +139,191 @@
         
 
 <div class="post">
+    <a href="/2025/06/23/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E4%BC%98%E9%9B%85%E5%85%B3%E9%97%AD/">
+        <h2 class="post-title">线程池优雅关闭</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2025/6/23
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>这个对线程池的一个优化，主要是防止在宕机过程中丢失数据的一个问题，然后宕机其实也分为就是</p>
+<ul>
+<li>普通宕机（服务崩溃、系统重启、kill -15）这种</li>
+<li>强制宕机（如kill -9 、停电）这种</li>
+</ul>
+<p>面对不同宕机我们要有不同的处理方式，因为首先在普通宕机的情况下，我们可以触发ShutDownHook函数，所以我们可以在CAP中的CA还衡量并选择。CAP指的是什么？</p>
+<ul>
+<li>C指的是在宕机过程中我们依旧可以让数据不错乱，保持逻辑的完整，简单来说就是在宕机时尽量让程序跑完，如果要超时了我们持久化未完成的任务</li>
+<li>A指的是在宕机过程中我们快速把未完成的任务存储到redis，核心是     最小化恢复时间，通过保存轻量级元数据（如任务ID、进度指针）实现。</li>
+<li>P指的是物理存储方面的可靠性，比如存储到磁盘</li>
+</ul>
+<p>强制宕机的情况下，我们能做的就是每一步写好日志BufferedWriter ，恢复之后我们自已去排查，强制宕机情况下,P是我们必须要保证的，如果连磁盘都不能持久化，CA何从谈起呢。</p>
+<p>我们最终选择了CP，然后我们主要说一下这个普通宕机的这种情况，首先的话</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">先注册钩子</span><br><span class="line">Runtime.getRuntime().addShutdownHook(new Thread(() -&gt; &#123;</span><br><span class="line">  System.out.println(&quot;收到关闭信号，开始优雅停机...&quot;);</span><br><span class="line">  saveStateAndShutdown();</span><br><span class="line">&#125;));</span><br><span class="line">然后优雅关闭之后触发持久化保存</span><br><span class="line">用</span><br></pre></td></tr></table></figure>
+
+<p>@PostConstruct 注解保证重启时候恢复</p>
+<p>具体代码实现如下：</p>
+<p>GracefulShutdownManager 类 用于注册管理钩子</p>
+<p>import java.util.List;</p>
+<p>import java.util.concurrent.ExecutorService;</p>
+<p>public class GracefulShutdownManager {</p>
+<p>  private final ExecutorService executor;</p>
+<p>  private final TaskStatePersistence persistence;</p>
+<p>  public GracefulShutdownManager(ExecutorService executor, TaskStatePersistence persistence) {</p>
+<p>​    this.executor &#x3D; executor;</p>
+<p>​    this.persistence &#x3D; persistence;</p>
+<p>  }</p>
+<p>  public void registerShutdownHook() {</p>
+<p>​    Runtime.getRuntime().addShutdownHook(new Thread(() -&gt; {</p>
+<p>​      System.out.println(“[ShutdownHook] 收到停机信号，开始优雅关闭…”);</p>
+<p>​      initiateShutdown();</p>
+<p>​    }));</p>
+<p>  }</p>
+<p>  private void initiateShutdown() {</p>
+<p>​    &#x2F;&#x2F; 1. 停止接收新任务</p>
+<p>​    executor.shutdown();</p>
+<p>​    </p>
+<p>​    try {</p>
+<p>​      &#x2F;&#x2F; 2. 等待现有任务完成</p>
+<p>​      if (!executor.awaitTermination(30, TimeUnit.SECONDS)) {</p>
+<p>​        &#x2F;&#x2F; 3. 超时后强制关闭并持久化未完成任务</p>
+<p>​        List<runnable> pendingTasks &#x3D; executor.shutdownNow();</runnable></p>
+<p>​        persistence.savePendingTasks(pendingTasks);</p>
+<p>​      }</p>
+<p>​    } catch (InterruptedException e) {</p>
+<p>​      Thread.currentThread().interrupt();</p>
+<p>​    }</p>
+<p>  }</p>
+<p>}</p>
+<p>TaskStatePersistence类 用于 用于负责持久化</p>
+<p>import java.io.*;</p>
+<p>import java.util.List;</p>
+<p>public class TaskStatePersistence {</p>
+<p>  public void savePendingTasks(List<runnable> tasks) {</runnable></p>
+<p>​    try (ObjectOutputStream oos &#x3D; new ObjectOutputStream(</p>
+<p>​      new FileOutputStream(“pending_tasks.dat”))) {</p>
+<p>​      oos.writeObject(tasks);</p>
+<p>​      System.out.println(“[Persistence] 未完成任务已持久化到磁盘”);</p>
+<p>​    } catch (IOException e) {</p>
+<p>​      throw new RuntimeException(“持久化失败”, e);</p>
+<p>​    }</p>
+<p>  }</p>
+<p>  public List<runnable> loadPendingTasks() {</runnable></p>
+<p>​    try (ObjectInputStream ois &#x3D; new ObjectInputStream(</p>
+<p>​      new FileInputStream(“pending_tasks.dat”))) {</p>
+<p>​      return (List<runnable>) ois.readObject();</runnable></p>
+<p>​    } catch (IOException | ClassNotFoundException e) {</p>
+<p>​      throw new RuntimeException(“恢复任务失败”, e);</p>
+<p>​    }</p>
+<p>  }</p>
+<p>}</p>
+<p>如果修改存储方式 只需要修改task类即可</p>
+<p>@PostConstruct</p>
+<p>  public void init() {</p>
+<p>​    System.out.println(“初始化完成，重启时会自动执行”);</p>
+<p>​    &#x2F;&#x2F; 在这里执行一些初始化操作</p>
+<p>​    myService.startService();</p>
+<p>  }</p>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2025/06/23/%E7%BA%BF%E7%A8%8B%E6%B1%A0%E4%BC%98%E9%9B%85%E5%85%B3%E9%97%AD/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2025/06/20/tencentpr/">
+        <h2 class="post-title">tencent-pr</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2025/6/20
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h1><span id="什么是springcloudtencent里面有哪些功能">什么是springcloudtencent？里面有哪些功能</span></h1>
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2025/06/20/tencentpr/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2025/06/16/Mysql/">
+        <h2 class="post-title">Mysql</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2025/6/16
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <h1><span id="目录">目录</span></h1><p><a href="#%E5%AD%98%E5%82%A8%E5%BC%95%E6%93%8E">存储引擎</a></p>
+<p><a href="#%E7%B4%A2%E5%BC%95">索引</a></p>
+<h1><span id="存储引擎">存储引擎</span></h1><h2><span id="执行一条sql请求的全过程">执行一条sql请求的全过程</span></h2><p>1.首先要建立连接，如果是本地连接就用文件协议，如果是远程则是TCP&#x2F;IP协议，通过端口号，ip地址，账号密码连接</p>
+<p>2.查询缓存，如果缓存命中则直接返回。Mysql8.0取消了这个模块</p>
+<p>3.解析器：经过词法分析和语法分析构建语法树，语法树的结构就是 select -&gt; c1,c2 -&gt; from -&gt;..</p>
+<p>4.sql执行过程：首先是预处理阶段，检查表和字段是否存在，然后做一些处理，比如select *  的* 展开为全部的列</p>
+<p>其次是优化阶段，将sql语句进行优化 比如where id &gt; 10+6 优化为 where id &gt; 16</p>
+<p>最后一步是查询结果集调用存储引擎</p>
+<h1><span id="索引">索引</span></h1><h2><span id="什么是索引">什么是索引？</span></h2><p>索引相当于书籍的目录，加快查询效率。</p>
+<p>Please let me know if there is any other problem.</p>
+<p>没有使用索引的情况下我们需要进行全盘扫描，时间复杂度是O（n），如果使用了索引我们在查询的时候可以使用二分查找，时间复杂度就是O（logn），因为mysql默认索引是B+树索引，他的搜索复杂度是O(logdN)d代表着树的高度。</p>
+<h2><span id="索引分为哪几个">索引分为哪几个</span></h2><ul>
+<li>数据结构：B+ tree、Hash索引、Full-text索引</li>
+<li>物理存储：聚簇索引（主键索引）、 二级索引</li>
+<li>字段特性：主键索引、唯一索引、普通索引、前缀索引</li>
+<li>字段个数：单列索引、多列索引</li>
+</ul>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2025/06/16/Mysql/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/2025/06/12/rag/">
         <h2 class="post-title">rag</h2>
     </a>
@@ -168,8 +353,7 @@
 <li>增强是将检索到的文档数据进行一个拼接</li>
 <li>生成是大模型和上下文进行结合最后回答的话</li>
 </ul>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">问题：<span class="string">&quot;量子纠缠的实际应用有哪些？&quot;</span></span><br><span class="line">检索到文档：量子通信、量子计算相关论文片段</span><br><span class="line">生成答案：<span class="string">&quot;量子纠缠应用于量子密钥分发（QKD）和量子计算机中的量子比特耦合...&quot;</span></span><br></pre></td></tr></table></figure>
-
+<p><code>问题：&quot;量子纠缠的实际应用有哪些？&quot; 检索到文档：量子通信、量子计算相关论文片段 生成答案：&quot;量子纠缠应用于量子密钥分发（QKD）和量子计算机中的量子比特耦合...&quot;</code></p>
 <h1><span id="为什么会有rag">为什么会有RAG？</span></h1><p>因为大模型会有知识局限性、幻觉问题、数据安全性问题</p>
 <ul>
 <li><p>知识局限性：大模型里面数据基本上都是现在网络中能查到的，有些非公开的和离线的数据差不多。</p>
