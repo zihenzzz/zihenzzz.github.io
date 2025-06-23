@@ -324,6 +324,39 @@
 </div>
 
 <div class="post">
+    <a href="/2025/06/13/%E9%BB%91%E5%90%8D%E5%8D%95%E8%AF%BB%E5%A4%9A%E5%86%99%E5%B0%91/">
+        <h2 class="post-title">黑名单读多写少</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2025/6/13
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>这个情况主要是真针对黑名单的，就是说我们最开始使用了本地缓存，然后从数据库里面不断刷DB，一分钟刷一次，最开始我们可以接收半分钟左右的延迟，不是那么高的一致性，随着业务发展，我们发现半分钟的延迟我们已经接受不了了，所以我们从本地缓存移动到了redis中，然后我们的redis数据结构采取的是String，key是用户id，value就是1.</p>
+<p>然后就是本地缓存他是靠我们定时的去刷取DB的，这种情况必然会导致有一定时间的数据不一致性问题，当我换成redis时候，就可以完全避免这种问题了。</p>
+<p>就是当我们查询的时候先查redis，如果有就返回，没有的话我们就再去查一遍数据库嘛，然后在redis中刷回来，这是一个读多写少的任务。但如果在修改的时候我们采取先更新数据库在删除缓存。</p>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2025/06/13/%E9%BB%91%E5%90%8D%E5%8D%95%E8%AF%BB%E5%A4%9A%E5%86%99%E5%B0%91/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
     <a href="/2025/06/12/rag/">
         <h2 class="post-title">rag</h2>
     </a>
