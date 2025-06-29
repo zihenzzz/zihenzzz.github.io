@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>JWT、Session、cookie | 子痕zzz</title>
+    <title>采⽤Gateway实现统⼀的鉴权及分布式会话共享功能，在⽹关层实现统⼀的全局异常处理 | 子痕zzz</title>
     <meta name="author" content="子痕zzz" />
     <meta name="description" content="" />
     <meta name="keywords" content="" />
@@ -114,21 +114,27 @@
         <div id="main" :class="loading ? 'into-enter-from': 'into-enter-active'">
             <div class="article">
     <div>
-        <h1>JWT、Session、cookie</h1>
+        <h1>采⽤Gateway实现统⼀的鉴权及分布式会话共享功能，在⽹关层实现统⼀的全局异常处理</h1>
     </div>
     <div class="info">
         <span class="date">
             <span class="icon">
                 <i class="fa-solid fa-calendar fa-fw"></i>
             </span>
-            2025/6/28
+            2025/6/29
         </span>
         
         
     </div>
     
     <div class="content" v-pre>
-        
+        <p>首先说一下鉴权模型，鉴权模型是RBAC，用户、权限、角色，每一个都是多对多的关系。</p>
+<p>然后说一下鉴权数据放在了redis里面，因为在微服务情况下，session是无法正常工作的，因为session要存于单个服务的内存之中，违反的微服务的“无状态”的核心原则，同时也伴随着session丢失的问题。</p>
+<p>基于 redis 建立会话中心，节点改为无状态。从实现上，我们选择了主流的 redis 来存储权限信息。同时配合了网关 gateway 实现权限接口，来实现统一的鉴权处理。避免了与数据库频繁的交互。</p>
+<p>然后说一下Gateway网关是如何设计的，我们找个gateway网关作为一个流量的主入口，负责拦截、异常处理、路由、负载、鉴权。</p>
+<p>分布式下的鉴权主要有三种方式，第一种直接用orm框架，比如mybatis这种，就直接和数据库进行交互；第二种就是先访问redis，在访问mysql；第三种是直接访问redis。我们采用第三种方式，就是直接刷redis，这有一个前提就是redis要高可用，防止一些意外发生。我们可以使用刷新策略，通过 Scheduled [ˈʃedjuːld]。</p>
+<p>gateway异常处理主要是通过实现ErrorWebExceptionHandler，然后实现handler方法，在这个方法中，我们就能拿到request、respone、webhandler会帮助我们获取到异常的信息，然后我们做一些逻辑处理，然后通过respone返回就可以了。</p>
+
     </div>
     
     

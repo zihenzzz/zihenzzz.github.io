@@ -139,8 +139,8 @@
         
 
 <div class="post">
-    <a href="/2025/06/28/JWT%E3%80%81Session%E3%80%81cookie/">
-        <h2 class="post-title">JWT、Session、cookie</h2>
+    <a href="/2025/06/29/%E9%87%87%E2%BD%A4Gateway%E5%AE%9E%E7%8E%B0%E7%BB%9F%E2%BC%80%E7%9A%84%E9%89%B4%E6%9D%83%E5%8F%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BC%9A%E8%AF%9D%E5%85%B1%E4%BA%AB%E5%8A%9F%E8%83%BD%EF%BC%8C%E5%9C%A8%E2%BD%B9%E5%85%B3%E5%B1%82%E5%AE%9E%E7%8E%B0%E7%BB%9F%E2%BC%80%E7%9A%84%E5%85%A8%E5%B1%80%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/">
+        <h2 class="post-title">采⽤Gateway实现统⼀的鉴权及分布式会话共享功能，在⽹关层实现统⼀的全局异常处理</h2>
     </a>
     <div class="category-and-date">
         
@@ -148,7 +148,76 @@
             <span class="icon">
                 <i class="fa-solid fa-calendar fa-fw"></i>
             </span>
-            2025/6/28
+            2025/6/29
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>首先说一下鉴权模型，鉴权模型是RBAC，用户、权限、角色，每一个都是多对多的关系。</p>
+<p>然后说一下鉴权数据放在了redis里面，因为在微服务情况下，session是无法正常工作的，因为session要存于单个服务的内存之中，违反的微服务的“无状态”的核心原则，同时也伴随着session丢失的问题。</p>
+<p>基于 redis 建立会话中心，节点改为无状态。从实现上，我们选择了主流的 redis 来存储权限信息。同时配合了网关 gateway 实现权限接口，来实现统一的鉴权处理。避免了与数据库频繁的交互。</p>
+<p>然后说一下Gateway网关是如何设计的，我们找个gateway网关作为一个流量的主入口，负责拦截、异常处理、路由、负载、鉴权。</p>
+<p>分布式下的鉴权主要有三种方式，第一种直接用orm框架，比如mybatis这种，就直接和数据库进行交互；第二种就是先访问redis，在访问mysql；第三种是直接访问redis。我们采用第三种方式，就是直接刷redis，这有一个前提就是redis要高可用，防止一些意外发生。我们可以使用刷新策略，通过 Scheduled [ˈʃedjuːld]。</p>
+<p>gateway异常处理主要是通过实现ErrorWebExceptionHandler，然后实现handler方法，在这个方法中，我们就能拿到request、respone、webhandler会帮助我们获取到异常的信息，然后我们做一些逻辑处理，然后通过respone返回就可以了。</p>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2025/06/29/%E9%87%87%E2%BD%A4Gateway%E5%AE%9E%E7%8E%B0%E7%BB%9F%E2%BC%80%E7%9A%84%E9%89%B4%E6%9D%83%E5%8F%8A%E5%88%86%E5%B8%83%E5%BC%8F%E4%BC%9A%E8%AF%9D%E5%85%B1%E4%BA%AB%E5%8A%9F%E8%83%BD%EF%BC%8C%E5%9C%A8%E2%BD%B9%E5%85%B3%E5%B1%82%E5%AE%9E%E7%8E%B0%E7%BB%9F%E2%BC%80%E7%9A%84%E5%85%A8%E5%B1%80%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2025/06/29/%E5%9F%BA%E4%BA%8E%E5%B0%81%E8%A3%85%E2%BE%83%E5%AE%9A%E4%B9%89%E7%9A%84esclient%EF%BC%8C%E2%BD%80%E6%8C%81%E7%B4%A2%E5%BC%95%E5%88%87%E6%8D%A2%EF%BC%8C%E5%B0%81%E8%A3%85%E4%BA%86%E5%B8%B8%E2%BD%A4%E7%9A%84%E4%B8%9A%E5%8A%A1%E5%87%BD%E6%95%B0%EF%BC%8C%E5%AE%9E%E7%8E%B0%E2%BD%B9%E7%AB%99%E7%9A%84%E2%BE%BC%E4%BA%AE%E6%90%9C%E7%B4%A2%E5%8A%9F%E8%83%BD%EF%BC%9B/">
+        <h2 class="post-title">基于封装⾃定义的esclient，⽀持索引切换，封装了常⽤的业务函数，实现⽹站的⾼亮搜索功能；</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2025/6/29
+        </span>
+        
+        
+    </div>
+    <div class="description">
+        <div class="content" v-pre>
+            
+            <p>全文检索只要是引入es的依赖模块，依靠其强大的倒排索引，根据keyword关键字进行查询，然后根据评分排序，评分高的排在上面，然后就是高亮如何展示的，就是说我们要确定那个展示的标签嘛，比如span red这种。</p>
+<p>传统的es使用方式就是引入es的依赖，然后创建一些我们需要的实体啊，然后通过@Document注解来指定索引（index &#x3D; “”）还可以指定是否在首次创建。然后我们去继承ElasticsearchRepository&lt;SubjectInfoEs, Long&gt;，然后就自已去写一个接口 crud的，最后通过继承的这个类和实体和es依赖提供的方法去做事。</p>
+<p>我们首先要封装比如集群名称、集群索引、其次就是es返回的哪些参数（条件、参数、页数、快照、高亮）这种，其次还有文档id、data数据，data数据。然后通过原生的es去做事。可以更精细的控制响应。</p>
+
+            
+        </div>
+    </div>
+    <div class="post-tags">
+        
+        
+        
+    </div>
+    <a href="/2025/06/29/%E5%9F%BA%E4%BA%8E%E5%B0%81%E8%A3%85%E2%BE%83%E5%AE%9A%E4%B9%89%E7%9A%84esclient%EF%BC%8C%E2%BD%80%E6%8C%81%E7%B4%A2%E5%BC%95%E5%88%87%E6%8D%A2%EF%BC%8C%E5%B0%81%E8%A3%85%E4%BA%86%E5%B8%B8%E2%BD%A4%E7%9A%84%E4%B8%9A%E5%8A%A1%E5%87%BD%E6%95%B0%EF%BC%8C%E5%AE%9E%E7%8E%B0%E2%BD%B9%E7%AB%99%E7%9A%84%E2%BE%BC%E4%BA%AE%E6%90%9C%E7%B4%A2%E5%8A%9F%E8%83%BD%EF%BC%9B/" class="go-post">阅读全文</a>
+</div>
+
+<div class="post">
+    <a href="/2025/06/29/%E5%9F%BA%E4%BA%8Efuturetask%E5%8F%8Acompletablefuture%E4%BC%98%E5%8C%96%E4%BA%86%E5%88%86%E7%B1%BB%E6%A0%87%E7%AD%BE%E7%9A%84%E5%B9%B6%E5%8F%91%E6%9F%A5%E8%AF%A2%EF%BC%8C%E6%8F%90%E5%8D%87%E6%80%A7%E8%83%BD80/">
+        <h2 class="post-title">基于futuretask及completablefuture优化了分类标签的并发查询，提升性能80%~</h2>
+    </a>
+    <div class="category-and-date">
+        
+        <span class="date">
+            <span class="icon">
+                <i class="fa-solid fa-calendar fa-fw"></i>
+            </span>
+            2025/6/29
         </span>
         
         
@@ -165,7 +234,7 @@
         
         
     </div>
-    <a href="/2025/06/28/JWT%E3%80%81Session%E3%80%81cookie/" class="go-post">阅读全文</a>
+    <a href="/2025/06/29/%E5%9F%BA%E4%BA%8Efuturetask%E5%8F%8Acompletablefuture%E4%BC%98%E5%8C%96%E4%BA%86%E5%88%86%E7%B1%BB%E6%A0%87%E7%AD%BE%E7%9A%84%E5%B9%B6%E5%8F%91%E6%9F%A5%E8%AF%A2%EF%BC%8C%E6%8F%90%E5%8D%87%E6%80%A7%E8%83%BD80/" class="go-post">阅读全文</a>
 </div>
 
 <div class="post">
@@ -517,186 +586,6 @@
         
     </div>
     <a href="/2025/06/12/rag/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/2025/06/11/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/">
-        <h2 class="post-title">分布式事务</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2025/6/11
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <h2><span id="目录">目录</span></h2><ul>
-<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1">什么是分布式事务？</a></li>
-<li><a href="#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1%E7%9A%84%E5%AE%9A%E7%90%86">分布式事务的定理</a><ul>
-<li><a href="#cap">CAP</a></li>
-<li><a href="#cap%E5%8F%96%E8%88%8D%E9%97%AE%E9%A2%98">CAP取舍问题</a></li>
-<li><a href="#base%E5%AE%9A%E7%90%86">Base定理</a></li>
-</ul>
-</li>
-<li><a href="#%E5%88%9A%E6%80%A7%E4%BA%8B%E5%8A%A1">刚性事务</a><ul>
-<li><a href="#2pc">2PC</a></li>
-<li><a href="#3pc">3PC</a></li>
-</ul>
-</li>
-<li><a href="#%E6%9F%94%E6%80%A7%E4%BA%8B%E5%8A%A1">柔性事务</a></li>
-</ul>
-<hr>
-<h4><span id="什么是分布式事务">什么是？</span></h4><p>大家都知道事务有<strong>四大特性（ACID）</strong>：  </p>
-<ul>
-<li><strong>原子性</strong>（Atomicity）</li>
-<li><strong>一致性</strong>（Consistency）</li>
-<li><strong>隔离性</strong>（Isolation）</li>
-<li><strong>持久性</strong>（Durability）</li>
-</ul>
-<p>分布式事务是指跨多个数据库或服务的操作，需要保证所有参与方要么全部成功提交，要么全部回滚。<br><img src="/images/13c4898371914468beb265cc8682af92.png" alt="分布式事务示意图"></p>
-<blockquote>
-<p><strong>核心挑战</strong>：在分布式环境下，网络分区、节点故障等问题会破坏ACID特性。</p>
-</blockquote>
-<hr>
-<h2><span id="分布式事务的定理">分布式事务的定理</span></h2><h3><span id="cap">CAP</span></h3><p>由Eric Brewer提出，描述分布式系统的三个核心特性：<br><img src="/images/867c0d16d092482681e117cf1e3fb3aa.png" alt="CAP定理图示"></p>
-<table>
-<thead>
-<tr>
-<th>特性</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><strong>C</strong>onsistency</td>
-<td>所有节点同时看到相同数据</td>
-</tr>
-<tr>
-<td><strong>A</strong>vailability</td>
-<td>每次请求必须得到响应</td>
-</tr>
-<tr>
-<td><strong>P</strong>artition Tolerance</td>
-<td>网络分区时系统仍能运行</td>
-</tr>
-</tbody></table>
-<blockquote>
-<p><strong>CAP不可兼得</strong>：实际系统中必须牺牲其一（通常选择CP或AP）。</p>
-</blockquote>
-<hr>
-<h3><span id="cap取舍问题">CAP取舍问题</span></h3><p>由于分区容错性（P）是分布式系统的刚需，实际取舍在C和A之间：</p>
-<table>
-<thead>
-<tr>
-<th>选择</th>
-<th>场景</th>
-<th>案例</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><strong>CP</strong></td>
-<td>强一致性优先</td>
-<td>银行转账、ZooKeeper</td>
-</tr>
-<tr>
-<td><strong>AP</strong></td>
-<td>高可用性优先</td>
-<td>电商库存、Cassandra</td>
-</tr>
-</tbody></table>
-<hr>
-<h3><span id="base定理">Base定理</span></h3><p>对CAP的补充，强调最终一致性：</p>
-<ul>
-<li><strong>BA</strong>（Basically Available）：允许降级服务</li>
-<li><strong>S</strong>（Soft State）：允许中间状态不一致</li>
-<li><strong>E</strong>（Eventual Consistency）：最终达成一致</li>
-</ul>
-<blockquote>
-<p>适用于容忍延迟一致性的场景（如社交媒体的点赞数同步）。</p>
-</blockquote>
-<hr>
-<h2><span id="刚性事务">刚性事务</span></h2><h3><span id="2pc两阶段提交">2PC（两阶段提交）</span></h3><p><strong>阶段1：准备阶段</strong>  </p>
-<ol>
-<li>协调者发送Prepare请求  </li>
-<li>参与者执行事务但不提交  </li>
-<li>返回Ready&#x2F;Abort状态</li>
-</ol>
-<p><strong>阶段2：提交阶段</strong>  </p>
-<ul>
-<li>全部Ready → 发送Commit  </li>
-<li>任意Abort → 发送Rollback</li>
-</ul>
-<pre><code class="language-plaintext">Coordinator → Participant 1: Prepare Request
-Participant 1 → Coordinator: Prepare OK
-Coordinator → Participant 2: Prepare Request
-Participant 2 → Coordinator: Prepare OK
-Coordinator → All: Commit Request
-</code></pre>
-
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        
-        
-    </div>
-    <a href="/2025/06/11/%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1/" class="go-post">阅读全文</a>
-</div>
-
-<div class="post">
-    <a href="/2025/06/11/Raft%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95/">
-        <h2 class="post-title">Raft一致性算法</h2>
-    </a>
-    <div class="category-and-date">
-        
-        <span class="date">
-            <span class="icon">
-                <i class="fa-solid fa-calendar fa-fw"></i>
-            </span>
-            2025/6/11
-        </span>
-        
-        
-    </div>
-    <div class="description">
-        <div class="content" v-pre>
-            
-            <h2><span id="目录">目录</span></h2><ul>
-<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AFraft">什么是Raft？</a></li>
-<li><a href="#raft%E7%9A%84%E9%80%89%E4%B8%BE%E6%9C%BA%E5%88%B6">raft的选举机制</a></li>
-</ul>
-<h2><span id="什么是raft">什么是Raft？</span></h2><p>​        Raft是一种非拜占庭的算法，指的是所有通信都必须是真实的而非捏造的，Raft最多容许N个节点中（N为奇数）故障(N-1)&#x2F;2,就是不能故障超过半数。</p>
-<p><img src="/images/8675e1c6e0e646e9be93a2e76b7b3b0f.gif" alt="8675e1c6e0e646e9be93a2e76b7b3b0f"></p>
-<p>​        如图所示，这是Raft的日志复制流程，每个节点都通过日志列表来记录对应的操作，Raft里面有三个角色，分别是Leader（领导）、Follower（跟随者）、Candidate（获选人）。最开始每一个都是Follower，通过Raft的定时器来变成Candidate，之后通过投票选举变成Leader。每一个客户端都要和Leader交互。</p>
-<p>​        当Leader接收到请求之后，并不会立刻执行对应操作，而是将操作写入到日志文件当中，并发送给Follower让他们也写入到自已的日志中并返回信息给Leader，只有超过半数写入日志后Leader才会返回给客户端，同时告诉其他节点进行此操作。</p>
-<p>Raft解决了什么问题？</p>
-<p>​        Raft是一致性算法，所谓一致性算法就是解决再单机情况下如果出现问题，导致数据丢失等事情的发生。那如何解决的呢？答案很简单，就是通过备份，在一台机器上容易发生问题？那我就多台，在每台机器上都执行对应的操作不就行了！</p>
-<h2><span id="raft的选举机制">Raft的选举机制</span></h2><p><img src="/images/37ab00c30fa94890948458a4866b0145.gif" alt="img"><img src="data:image/gif;base64,R0lGODlhAQABAPABAP///wAAACH5BAEKAAAALAAAAAABAAEAAAICRAEAOw==" alt="点击并拖拽以移动">编辑</p>
-<p>​        如图所示，这就是Raft的初次选举，在最开始的时候所有节点都是Follower，每个Follower都有一个定时器，当收到Leader的信息之后会更新定时器，当定时器结束时没有收到Leader发来消息，证明Leader已经死亡或者根本不存在，这个时候该节点就会变成Candidate，通过投票选举（该节点向其他节点发出投票信息，如果超过一半以上即通过选举，该节点成为Leader），成功成为Leader之后，新的Leader会向其他Follower发送心跳信息，方式其他节点成为Leader节点。</p>
-<p>​        如果该节点未能成功竞选为Leader，那么Raft会重复这个操作，直到出现Leader为止。</p>
-<p>选举分区</p>
-<p>​        选举分区是一种特殊情况，指的是在Follower节点和Leader发生沟通问题，从而自已形成了一个区域，并且在这个区域内会产生一个新的Leader。但是因为规定，必须要写入日志的节点要超过一半才可以，所以N为奇数时候，无论怎么分区都是可以正常运行的。  </p>
-<p>Raft的日志复制</p>
-<p>​        Raft的日志复制保证以下三个特点：</p>
-<p>日志追加不会覆盖<br>如果index（日志顺序的标志，且递增）和term（每次选举成功会将自身的term+1，其他节点介绍到新的term会更信）相同，则日志相同。<br>如果日志相同，则前面的日志也相同。<br>  Raft的日志同步</p>
-<p>Leader的同步机制：<br>Leader为每个Follower维护nextIndex（待发送的日志起始index）和matchIndex（已确认复制的最高index）。初始时：</p>
-
-            
-        </div>
-    </div>
-    <div class="post-tags">
-        
-        
-        
-    </div>
-    <a href="/2025/06/11/Raft%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95/" class="go-post">阅读全文</a>
 </div>
 
 
