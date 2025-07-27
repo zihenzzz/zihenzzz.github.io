@@ -156,7 +156,8 @@
     <div class="description">
         <div class="content" v-pre>
             
-            <p>CAS的全称呢是compareandswap，就是比较并交换。然后CAS是乐观锁嘛，就是在软件层面上看是无锁的，至于在硬件层面也相当于有锁，这个我们后面说。cas具体是如何操作的呢，cas有三个值，老值，预期值，新值，老值就是内存里面的那个值，然后拿预期值和老值比，如果相当就更新为新值，如果两个线程AB，A先进入到了CAS，此时B就被挡在外面了，B有两种选择，要么不断尝试，要么就放弃。然后compareandswap是两步操作，得保证原子性，这个时候就涉及硬件层面了，</p>
+            <p>CAS的全称呢是compareandswap，就是比较并交换。然后CAS是乐观锁嘛，就是在软件层面上看是无锁的，至于在硬件层面也相当于有锁，这个我们后面说。cas具体是如何操作的呢，cas有三个值，老值，预期值，新值，老值就是内存里面的那个值，然后拿预期值和老值比，如果相当就更新为新值，如果两个线程AB，A先进入到了CAS，此时B就被挡在外面了，B有两种选择，要么不断尝试，要么就放弃。然后compareandswap是两步操作，得保证原子性，这个时候就涉及硬件层面了，在java中你要使用cas就要去调用unsafe的compareandswapint long object等方法，这些方法都是由native修饰的方法，就是由C++实现的，那即便是C++写的他也不能保证原子性对吧，那这个时候，就要说到一个CPU原子指令的一个东西，X86架构的compare and exchange。这个就是通过硬件层面实现的，他是通过直接锁定总线或者锁定缓存行实现的。</p>
+<p>AtomicLong和AtomicInteger就是通过volatile修饰，保证可见性，通过cas保证原子性</p>
 
             
         </div>
@@ -373,7 +374,7 @@
 </ul>
 <p>强制宕机的情况下，我们能做的就是每一步写好日志BufferedWriter ，恢复之后我们自已去排查，强制宕机情况下,P是我们必须要保证的，如果连磁盘都不能持久化，CA何从谈起呢。</p>
 <p>我们最终选择了CP，然后我们主要说一下这个普通宕机的这种情况，首先的话</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">先注册钩子</span><br><span class="line">Runtime.getRuntime().addShutdownHook(new Thread(() -&gt; &#123;</span><br><span class="line">  System.out.println(&quot;收到关闭信号，开始优雅停机...&quot;);</span><br><span class="line">  saveStateAndShutdown();</span><br><span class="line">&#125;));</span><br><span class="line">然后优雅关闭之后触发持久化保存</span><br><span class="line">用</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//先注册钩子</span></span><br><span class="line">Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">  System.out.println(<span class="string">&quot;收到关闭信号，开始优雅停机...&quot;</span>);</span><br><span class="line">  saveStateAndShutdown();</span><br><span class="line">&#125;));</span><br><span class="line"><span class="comment">//然后优雅关闭之后触发持久化保存用</span></span><br></pre></td></tr></table></figure>
 
 <p>@PostConstruct 注解保证重启时候恢复</p>
 <p>具体代码实现如下：</p>

@@ -141,7 +141,7 @@
 </ul>
 <p>强制宕机的情况下，我们能做的就是每一步写好日志BufferedWriter ，恢复之后我们自已去排查，强制宕机情况下,P是我们必须要保证的，如果连磁盘都不能持久化，CA何从谈起呢。</p>
 <p>我们最终选择了CP，然后我们主要说一下这个普通宕机的这种情况，首先的话</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">先注册钩子</span><br><span class="line">Runtime.getRuntime().addShutdownHook(new Thread(() -&gt; &#123;</span><br><span class="line">  System.out.println(&quot;收到关闭信号，开始优雅停机...&quot;);</span><br><span class="line">  saveStateAndShutdown();</span><br><span class="line">&#125;));</span><br><span class="line">然后优雅关闭之后触发持久化保存</span><br><span class="line">用</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//先注册钩子</span></span><br><span class="line">Runtime.getRuntime().addShutdownHook(<span class="keyword">new</span> <span class="title class_">Thread</span>(() -&gt; &#123;</span><br><span class="line">  System.out.println(<span class="string">&quot;收到关闭信号，开始优雅停机...&quot;</span>);</span><br><span class="line">  saveStateAndShutdown();</span><br><span class="line">&#125;));</span><br><span class="line"><span class="comment">//然后优雅关闭之后触发持久化保存用</span></span><br></pre></td></tr></table></figure>
 
 <p>@PostConstruct 注解保证重启时候恢复</p>
 <p>具体代码实现如下：</p>
